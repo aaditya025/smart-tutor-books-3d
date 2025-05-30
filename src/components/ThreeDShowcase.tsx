@@ -1,5 +1,5 @@
 
-import { Cube, RotateCcw, ZoomIn, Play } from "lucide-react";
+import { Box, RotateCcw, ZoomIn, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -23,7 +23,7 @@ const ThreeDShowcase = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg flex items-center justify-center">
-                    <Cube className="h-5 w-5" />
+                    <Box className="h-5 w-5" />
                   </div>
                   Molecular Structures
                 </CardTitle>
