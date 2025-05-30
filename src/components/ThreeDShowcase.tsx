@@ -1,15 +1,31 @@
 
-import { Box, RotateCcw, ZoomIn, Play } from "lucide-react";
+import { Box, RotateCcw, ZoomIn, ZoomOut, Play, Pause, RotateCw, Move3D } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
+import { useState } from "react";
 
 const ThreeDShowcase = () => {
+  const [isRotating, setIsRotating] = useState(true);
+  const [rotationSpeed, setRotationSpeed] = useState([50]);
+  const [zoomLevel, setZoomLevel] = useState([50]);
+  const [selectedModel, setSelectedModel] = useState("dna");
+
+  const models = {
+    dna: { emoji: "🧬", name: "DNA Double Helix", color: "from-blue-800 to-purple-900" },
+    molecule: { emoji: "⚛️", name: "Water Molecule", color: "from-green-800 to-blue-900" },
+    atom: { emoji: "🔬", name: "Carbon Atom", color: "from-red-800 to-orange-900" },
+    crystal: { emoji: "💎", name: "Crystal Structure", color: "from-purple-800 to-pink-900" }
+  };
+
+  const currentModel = models[selectedModel as keyof typeof models];
+
   return (
     <section className="py-20 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold mb-4">
-            3D Interactive Learning
+            Interactive 3D Learning
           </h2>
           <p className="text-xl text-blue-100 max-w-3xl mx-auto">
             Transform abstract concepts into tangible 3D experiences. Students can explore, 
@@ -89,11 +105,11 @@ const ThreeDShowcase = () => {
           </div>
           
           <div className="relative">
-            {/* 3D Visualization Mockup */}
+            {/* Interactive 3D Visualization */}
             <div className="bg-gradient-to-br from-blue-600 to-purple-700 rounded-3xl p-8 shadow-2xl">
               <div className="bg-black rounded-2xl p-6 mb-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-white font-semibold">DNA Double Helix Model</h4>
+                  <h4 className="text-white font-semibold">{currentModel.name}</h4>
                   <div className="flex gap-2">
                     <div className="w-3 h-3 bg-red-400 rounded-full"></div>
                     <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
@@ -101,17 +117,90 @@ const ThreeDShowcase = () => {
                   </div>
                 </div>
                 
-                {/* Simulated 3D Model */}
-                <div className="aspect-square bg-gradient-to-br from-blue-800 to-purple-900 rounded-xl flex items-center justify-center relative overflow-hidden">
+                {/* Model Selection */}
+                <div className="flex gap-2 mb-4">
+                  {Object.entries(models).map(([key, model]) => (
+                    <Button
+                      key={key}
+                      size="sm"
+                      variant={selectedModel === key ? "default" : "outline"}
+                      onClick={() => setSelectedModel(key)}
+                      className="text-xs"
+                    >
+                      {model.emoji} {model.name.split(' ')[0]}
+                    </Button>
+                  ))}
+                </div>
+                
+                {/* Interactive 3D Model */}
+                <div className={`aspect-square bg-gradient-to-br ${currentModel.color} rounded-xl flex items-center justify-center relative overflow-hidden`}>
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
-                  <div className="text-6xl animate-spin-slow">🧬</div>
+                  <div 
+                    className={`text-6xl ${isRotating ? 'animate-spin' : ''}`}
+                    style={{ 
+                      animationDuration: `${3 - (rotationSpeed[0] / 50)}s`,
+                      transform: `scale(${0.5 + (zoomLevel[0] / 100)})` 
+                    }}
+                  >
+                    {currentModel.emoji}
+                  </div>
+                  
+                  {/* Interactive Controls Overlay */}
+                  <div className="absolute top-4 right-4 flex flex-col gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-8 h-8 p-0 bg-white/20 border-white/40 hover:bg-white/30"
+                      onClick={() => setIsRotating(!isRotating)}
+                    >
+                      {isRotating ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-8 h-8 p-0 bg-white/20 border-white/40 hover:bg-white/30"
+                    >
+                      <Move3D className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  
+                  {/* Bottom Controls */}
                   <div className="absolute bottom-4 left-4 right-4">
-                    <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 text-white text-xs">
-                      <p className="font-medium">Interactive Features:</p>
-                      <div className="flex gap-4 mt-2">
-                        <span>↻ Rotate</span>
-                        <span>⚡ Zoom</span>
-                        <span>🔍 Inspect</span>
+                    <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 text-white text-xs space-y-3">
+                      <div>
+                        <p className="font-medium mb-2">Controls:</p>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="flex items-center gap-1">
+                              <RotateCw className="h-3 w-3" />
+                              Speed
+                            </span>
+                            <div className="w-16">
+                              <Slider
+                                value={rotationSpeed}
+                                onValueChange={setRotationSpeed}
+                                max={100}
+                                step={1}
+                                className="w-full"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="flex items-center gap-1">
+                              <ZoomIn className="h-3 w-3" />
+                              Zoom
+                            </span>
+                            <div className="w-16">
+                              <Slider
+                                value={zoomLevel}
+                                onValueChange={setZoomLevel}
+                                max={100}
+                                step={1}
+                                className="w-full"
+                              />
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -128,6 +217,11 @@ const ThreeDShowcase = () => {
                   <p className="text-white text-sm">
                     <strong>AI Response:</strong> "Let me show you the hydrogen bonds between base pairs..."
                     <span className="inline-block ml-2 w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                  </p>
+                </div>
+                <div className="bg-blue-500/20 backdrop-blur-sm rounded-lg p-3">
+                  <p className="text-white text-sm">
+                    <strong>Try:</strong> "Rotate the model and zoom in to see the molecular bonds in detail!"
                   </p>
                 </div>
               </div>
